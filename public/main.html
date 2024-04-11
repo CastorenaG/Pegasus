@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Pegasus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Webflow">
+    <link href="https://assets-global.website-files.com/65c78f27d92b5470dcf98ad1/css/georginas-awesome-site-6a053c.webflow.dca57babc.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic,700,700italic,800,800italic%7CRoboto:300,regular,500" rel="stylesheet" media="all">
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" type="text/javascript"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="https://assets-global.website-files.com/img/favicon.ico">
+    <link rel="apple-touch-icon" href="https://assets-global.website-files.com/img/webclip.png">
+    <style>
+        /* Paleta de colores Pegasus */
+        :root {
+            --color-azul: #3F51B5;
+            --color-blanco: #FFFFFF;
+            --color-gris-claro: #E0E0E0;
+            --color-gris-oscuro: #9E9E9E;
+        }
+
+        /* Estilo para botones */
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 24px; /* Bordes redondeados */
+            background-color: var(--color-azul);
+            color: var(--color-blanco);
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .button:hover {
+            background-color: #32408f; /* Color ligeramente más oscuro al pasar el mouse */
+            transform: translateY(-2px); /* Efecto de levantamiento al pasar el mouse */
+        }
+
+        /* Estilo para botones huecos */
+        .hollow-button {
+            display: inline-block;
+            padding: 10px 22px;
+            border: 2px solid var(--color-azul);
+            border-radius: 24px; /* Bordes redondeados */
+            background-color: transparent;
+            color: var(--color-azul);
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .hollow-button:hover {
+            color: #32408f; /* Color ligeramente más oscuro al pasar el mouse */
+            border-color: #32408f; /* Color del borde ligeramente más oscuro al pasar el mouse */
+        }
+
+        /* Ajustes adicionales para el botón de Registrar */
+        .hollow-button.registrar {
+            opacity: 0.8; /* Opacidad reducida */
+            background-color: #fff; /* Color de fondo más claro */
+        }
+
+        .hollow-button.registrar:hover {
+            opacity: 0.9; /* Opacidad aumentada al pasar el mouse */
+        }
+
+        /* Estilo para la barra de navegación */
+        .navigation-bar {
+            background-color: var(--color-azul);
+            color: var(--color-blanco);
+            padding: 16px 0;
+        }
+
+        .brand-text {
+            color: var(--color-blanco);
+        }
+
+        .navigation-link {
+            color: var(--color-blanco);
+            margin-left: 16px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navigation-link:hover {
+            color: var(--color-gris-claro);
+        }
+
+        /* Estilo para el menú lateral */
+        #sidebar {
+            background-color: var(--color-gris-claro);
+            padding: 16px;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        #menu {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #menu li {
+            margin-bottom: 8px;
+        }
+
+        #menu li a {
+            color: var(--color-azul);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        #menu li a:hover {
+            color: var(--color-azul);
+            text-decoration: underline;
+        }
+
+        #menu li ul {
+            margin-left: 16px;
+            padding-left: 16px;
+            border-left: 2px solid var(--color-azul);
+        }
+    </style>
+     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword , signOut} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        // Configura tu proyecto de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3TOdybVoRlkWiy-pgpeDs1X-I0E87h-4",
+            authDomain: "pegasus-4f1c3.firebaseapp.com",
+            projectId: "pegasus-4f1c3",
+            storageBucket: "pegasus-4f1c3.appspot.com",
+            messagingSenderId: "406255839036",
+            appId: "1:406255839036:web:491e23a3220d81ce23a039",
+            measurementId: "G-1YRQW8HVHJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore();
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Verifica si hay información del usuario en la sesión o la cookie
+            const cargoUsuario = sessionStorage.getItem('cargoUsuario') || getCookie('cargoUsuario');
+
+            // Muestra el menú correspondiente al cargo del usuario
+            if (cargoUsuario) {
+                showMenuForUserRole(cargoUsuario.toLowerCase()); // Convertir a minúsculas para asegurar la coincidencia
+
+                // Actualiza el texto del título según el cargo del usuario
+                document.getElementById('userPosition').innerText = `User Position: ${cargoUsuario}`;
+            } else {
+                console.error('El cargo del usuario no está definido.');
+            }
+        });
+
+        // Función para obtener el valor de una cookie por su nombre
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Función para mostrar el menú correspondiente al cargo del usuario
+        function showMenuForUserRole(cargoUsuario) {
+            // Oculta todos los menús
+            const menus = document.querySelectorAll('.menu');
+            menus.forEach(menu => {
+                menu.style.display = 'none';
+            });
+
+            // Muestra el menú correspondiente al cargo del usuario
+            const menuToShow = document.getElementById(`menu-${cargoUsuario}`);
+            if (menuToShow) {
+                menuToShow.style.display = 'block';
+            }
+        }
+
+        // Evento de clic en el botón de cerrar sesión
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutButton = document.getElementById('logoutButton');
+            logoutButton.addEventListener('click', () => {
+                signOut(auth)
+                    .then(() => {
+                        sessionStorage.clear();
+                        window.location.href = '/index.html';
+                    })
+                    .catch((error) => {
+                        console.error('Error al cerrar sesión:', error);
+                    });
+            });
+        });
+    </script>
+    </script>
+</head>
+<body>
+    <h3 id="userPosition"></h3>
+
+    <nav id="sidebar">
+        <!-- Menú para Director -->
+        <ul id="menu-director" class="menu">
+            <li><a href="/public/menu/calificacion.html">Calificación</a></li>
+            <li><a href="/public/menu/reporte.html">Reporte</a></li>
+            <li><a href="/public/menu/registrar.html">Registrar</a></li>
+            <li><a href="/public/menu/eliminar.html">Eliminar</a></li>
+            <li><a href="/public/menu/alumno.html">Alumno</a></li>
+        </ul>
+
+        <!-- Menú para Administrativo
+        <ul id="menu-administrativo" class="menu">
+            <li><a href="/public/menu/calificacion.html">Calificación</a></li>
+            <li><a href="/public/menu/reporte.html">Reporte</a></li>
+            <li><a href="/public/menu/registrar.html">Registrar</a></li>
+            <li><a href="/public/menu/eliminar.html">Eliminar</a></li>
+            <li><a href="/public/menu/alumno.html">Alumno</a></li>
+        </ul>-->
+
+        <!-- Menú para Maestro
+        <ul id="menu-maestro" class="menu">
+            <li><a href="/public/menu/alumno.html">Alumno</a></li>
+            <li><a href="/public/menu/calificar.html">Calificar</a></li>
+            <li><a href="/public/menu/reporte.html">Reporte</a></li>
+        </ul>-->
+
+        <button id="logoutButton" class="button hollow-button registrar">Cerrar Sesión</button>
+    </nav>
+</body>
+</html>
